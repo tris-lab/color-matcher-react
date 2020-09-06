@@ -2,7 +2,7 @@ import React, { useState, CSSProperties } from 'react';
 import './App.css';
 import EFColor from './efcolor';
 
-
+type ColorType = 'RGB' | 'HSL';
 type ColorKind = 'Foreground' | 'Background' | null;
 
 type ColorElement = 'Red' | 'Green' | 'Blue' | 'Hue' | 'Saturation' | 'Lightness';
@@ -14,11 +14,21 @@ type ColorElementProp = {
   max: number; // 値の最大値。省略時は100。ちなみに最小値は0固定。
   value: string;
   onChange: (kind: ColorKind, element: ColorElement, value: string) => void;
-}
+};
+
+type ColorSelectorProps = {
+  t: ColorType;
+  kind: ColorKind;
+  values: string[]; // 表示する各色の値。
+  onChange: (kind: ColorKind, element: ColorElement, value: string) => void;
+};
 
 const FontFamilies = ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui'];
 const FontWeights = ['normal', 'bold'];
 
+// ------------------------------------------------------------------------
+// 色の1要素の値のコンポーネント。スライダー・テキストボックス・値表示。
+// ------------------------------------------------------------------------
 const ColorElementSelector: React.FC<ColorElementProp> = ({ kind, element, label, max, value, onChange }) => {
   // labelが省略されているとき、elementの1文字目を取得してlabelとする。
   if (label == null) {
@@ -33,13 +43,52 @@ const ColorElementSelector: React.FC<ColorElementProp> = ({ kind, element, label
           onChange={(e) => onChange(kind, element, e.currentTarget.value)}
           value={value} />
         <input
-          type="text" size={2} maxLength={3}
+          type="text" size={3} maxLength={3}
           onChange={(e) => onChange(kind, element, e.currentTarget.value)}
           value={value} />
           ({Math.round(Number(value) / max * 100)}%)
       </label>
     </div>
   )
+}
+
+
+// ------------------------------------------------------------------------
+// RGBまたはHSLを選択するコンポーネント。
+// ------------------------------------------------------------------------
+const ColorSelector: React.FC<ColorSelectorProps> = ({ t, kind, values, onChange }) => {
+  let elements: ColorElementProp[] = [];
+  let colors: ColorElement[];
+  let maxes: number[]
+
+  if (t === 'RGB') {
+    colors = ['Red', 'Green', 'Blue'];
+    maxes = [255, 255, 255];
+  } else {
+    // HSL
+    colors = ['Hue', 'Saturation', 'Lightness'];
+    maxes = [360, 100, 100];
+  }
+
+  for (const i in colors) {
+    elements.push({
+      kind: kind,
+      element: colors[i],
+      max: maxes[i],
+      value: values[i],
+      onChange: onChange,
+    });
+  }
+
+  return (
+    <div className="color-box">
+      {
+        elements.map((v) => (
+          <ColorElementSelector key={v.element} {...v} />
+        ))
+      }
+    </div>
+  );
 }
 
 
@@ -82,7 +131,8 @@ const App: React.FC = () => {
   const [fontWeight, setFontWeight] = useState(FontWeights[1]);
   const [textMessage, setTextMessage] = useState('This is sample text.');
 
-  // 色の要素の値が変更されたときに実行される関数。useStateの更新用関数で値を更新しても反映にはタイムラグがあるので書き方に注意(別変数を作って処理する)。
+  // 色の要素の値が変更されたときに実行される関数。
+  // useStateの更新用関数で値を更新しても反映にはタイムラグがあるので書き方に注意(別変数を作って処理している)。
   const colorElementChanged = (kind: ColorKind, element: ColorElement, value: string) => {
     let color: EFColor;
     let source: EFColor;
@@ -201,6 +251,7 @@ const App: React.FC = () => {
     }
   }
 
+  // テキスト・フォント関係の変更時のイベント処理
   const fontFamilyChanged = (value: string) => {
     setFontFamily(value);
   }
@@ -214,102 +265,6 @@ const App: React.FC = () => {
     setTextMessage(value);
   }
 
-  const bgRgbElements: ColorElementProp[] = [
-    {
-      kind: null,
-      element: 'Red',
-      value: bgRed,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Green',
-      value: bgGreen,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Blue',
-      value: bgBlue,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-  ];
-
-  const bgHslElements: ColorElementProp[] = [
-    {
-      kind: null,
-      element: 'Hue',
-      value: bgHue,
-      max: 360,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Saturation',
-      value: bgSaturation,
-      max: 100,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Lightness',
-      value: bgLightness,
-      max: 100,
-      onChange: colorElementChanged,
-    },
-  ];
-
-  const fgRgbElements: ColorElementProp[] = [
-    {
-      kind: null,
-      element: 'Red',
-      value: fgRed,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Green',
-      value: fgGreen,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Blue',
-      value: fgBlue,
-      max: 255,
-      onChange: colorElementChanged,
-    },
-  ];
-
-  const fgHslElements: ColorElementProp[] = [
-    {
-      kind: null,
-      element: 'Hue',
-      value: fgHue,
-      max: 360,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Saturation',
-      value: fgSaturation,
-      max: 100,
-      onChange: colorElementChanged,
-    },
-    {
-      kind: null,
-      element: 'Lightness',
-      value: fgLightness,
-      max: 100,
-      onChange: colorElementChanged,
-    },
-  ];
-
   // ページのタイトルを変更
   // document.title = 'Color Viewer';
 
@@ -321,20 +276,18 @@ const App: React.FC = () => {
       <h1>Color Viewer</h1>
       <div className="kind-box">
         <h2>Foreground (Text) - {fgColorCode} - {fgColor.cssRgb()} - {fgColor.cssHsl()}</h2>
-        <div className="color-box">
-          {
-            fgRgbElements.map((v) => (
-              <ColorElementSelector key={v.element} {...v} kind={'Foreground'} />
-            ))
-          }
-        </div>
-        <div className="color-box">
-          {
-            fgHslElements.map((v) => (
-              <ColorElementSelector key={v.element} {...v} kind={'Foreground'} />
-            ))
-          }
-        </div>
+        <ColorSelector
+          t="RGB"
+          kind="Foreground"
+          values={[fgRed, fgGreen, fgBlue]}
+          onChange={colorElementChanged}
+        />
+        <ColorSelector
+          t="HSL"
+          kind="Foreground"
+          values={[fgHue, fgSaturation, fgLightness]}
+          onChange={colorElementChanged}
+        />
         <div className="text-properties-box">
           <div className="title">Text Settings</div>&nbsp;
           Text:&nbsp;
@@ -377,25 +330,24 @@ const App: React.FC = () => {
           </select>
         </div>
       </div>
+
       <div className="kind-box">
         <h2>Background - {bgColorCode} - {bgColor.cssRgb()} - {bgColor.cssHsl()}</h2>
-        <div className="color-box">
-          {
-            bgRgbElements.map((v) => (
-              <ColorElementSelector key={v.element} {...v} kind={'Background'} />
-            ))
-          }
-        </div>
-        <div className="color-box">
-          {
-            bgHslElements.map((v) => (
-              <ColorElementSelector key={v.element} {...v} kind={'Background'} />
-            ))
-          }
-        </div>
+        <ColorSelector
+          t="RGB"
+          kind="Background"
+          values={[fgRed, fgGreen, fgBlue]}
+          onChange={colorElementChanged}
+        />
+        <ColorSelector
+          t="HSL"
+          kind="Background"
+          values={[fgHue, fgSaturation, fgLightness]}
+          onChange={colorElementChanged}
+        />
       </div>
+
       <div id="canvas-area" style={{
-        // backgroundColor: bgColorCode,
         color: fgColorCode,
         fontSize: `${fontSize}px`,
         fontFamily: fontFamily,
