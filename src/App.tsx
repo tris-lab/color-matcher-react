@@ -92,6 +92,9 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ t, kind, values, onChange
 }
 
 
+// ------------------------------------------------------------------------
+// メインコンポーネント。
+// ------------------------------------------------------------------------
 const App: React.FC = () => {
 
   // Background
@@ -105,11 +108,6 @@ const App: React.FC = () => {
   const [bgSaturation, setBgSaturation] = useState(String(Math.round(s)));
   const [bgLightness, setBgLightness] = useState(String(Math.round(l)));
 
-  const [bgColorCode, setBgColorCode] = useState(() => {
-    const color = new EFColor(Number(bgRed), Number(bgGreen), Number(bgGreen));
-    return color.colorCode()
-  });
-
   // Foreground (Text)
   const [fgRed, setFgRed] = useState('180');
   const [fgGreen, setFgGreen] = useState('230');
@@ -120,11 +118,6 @@ const App: React.FC = () => {
   const [fgHue, setFgHue] = useState(String(Math.round(h)));
   const [fgSaturation, setFgSaturation] = useState(String(Math.round(s)));
   const [fgLightness, setFgLightness] = useState(String(Math.round(l)));
-
-  const [fgColorCode, setFgColorCode] = useState(() => {
-    const color = new EFColor(Number(fgRed), Number(fgGreen), Number(fgGreen));
-    return color.colorCode()
-  });
 
   const [fontFamily, setFontFamily] = useState(FontFamilies[1]);
   const [fontSize, setFontSize] = useState(80);
@@ -219,14 +212,12 @@ const App: React.FC = () => {
       setBgBlue(String(Math.round(color.b)));
 
       setBgColor(color);
-      setBgColorCode(color.colorCode);
     } else {
       setFgRed(String(Math.round(color.r)));
       setFgGreen(String(Math.round(color.g)));
       setFgBlue(String(Math.round(color.b)));
 
       setFgColor(color);
-      setFgColorCode(color.colorCode);
     }
   }
 
@@ -240,14 +231,12 @@ const App: React.FC = () => {
       setBgLightness(String(Math.round(l)));
 
       setBgColor(color);
-      setBgColorCode(color.colorCode);
     } else {
       setFgHue(String(Math.round(h)));
       setFgSaturation(String(Math.round(s)));
       setFgLightness(String(Math.round(l)));
 
       setFgColor(color);
-      setFgColorCode(color.colorCode);
     }
   }
 
@@ -269,13 +258,13 @@ const App: React.FC = () => {
   // document.title = 'Color Viewer';
 
   // 背景色を動的に設定。
-  document.body.style.background = bgColorCode;
+  document.body.style.background = bgColor.colorCode();
 
   return (
     <div className="App">
       <h1>Color Viewer</h1>
       <div className="kind-box">
-        <h2>Foreground (Text) - {fgColorCode} - {fgColor.cssRgb()} - {fgColor.cssHsl()}</h2>
+        <h2>Foreground (Text) - {fgColor.colorCode()} - {fgColor.cssRgb()} - {fgColor.cssHsl()}</h2>
         <ColorSelector
           t="RGB"
           kind="Foreground"
@@ -307,9 +296,7 @@ const App: React.FC = () => {
           >
             {
               FontFamilies.map((v) => (
-                <option value={v} key={v}>
-                  {v}
-                </option>
+                <option value={v} key={v}>{v}</option>
               ))
             }
           </select>
@@ -322,9 +309,7 @@ const App: React.FC = () => {
           >
             {
               FontWeights.map((v) => (
-                <option value={v} key={v}>
-                  {v}
-                </option>
+                <option value={v} key={v}>{v}</option>
               ))
             }
           </select>
@@ -332,7 +317,7 @@ const App: React.FC = () => {
       </div>
 
       <div className="kind-box">
-        <h2>Background - {bgColorCode} - {bgColor.cssRgb()} - {bgColor.cssHsl()}</h2>
+        <h2>Background - {bgColor.colorCode()} - {bgColor.cssRgb()} - {bgColor.cssHsl()}</h2>
         <ColorSelector
           t="RGB"
           kind="Background"
@@ -348,7 +333,7 @@ const App: React.FC = () => {
       </div>
 
       <div id="canvas-area" style={{
-        color: fgColorCode,
+        color: fgColor.colorCode(),
         fontSize: `${fontSize}px`,
         fontFamily: fontFamily,
         fontWeight: fontWeight,
