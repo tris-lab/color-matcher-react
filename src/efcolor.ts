@@ -63,6 +63,13 @@ export default class EFColor {
   public set b(value: number) {
     this._b = remapValue(value, 0, 255);
   }
+  
+  /**
+   * RGBの値(整数)を返す。値の範囲は、それぞれ0-255。
+   */
+  public get rgb(): number[] {
+    return [this.r, this.g, this.b];
+  }
 
   /**
    * HSLの値(整数)を返す。値の範囲は、H(0-359)、S(0-100)、L(0-100)。
