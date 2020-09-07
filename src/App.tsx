@@ -336,13 +336,13 @@ const App: React.FC = () => {
         <ColorSelector
           t="RGB"
           kind="Background"
-          values={[fgRed, fgGreen, fgBlue]}
+          values={[bgRed, bgGreen, bgBlue]}
           onChange={colorElementChanged}
         />
         <ColorSelector
           t="HSL"
           kind="Background"
-          values={[fgHue, fgSaturation, fgLightness]}
+          values={[bgHue, bgSaturation, bgLightness]}
           onChange={colorElementChanged}
         />
       </div>
