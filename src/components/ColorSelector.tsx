@@ -1,7 +1,7 @@
 // 色を表示・選択するコンポーネント。
 // RGBまたはHSLの3色をまとめて表示する。
 
-import React, { Dispatch } from 'react';
+import React, { Dispatch, memo } from 'react';
 import ColorElementSelector, { ColorElementProp } from './ColorElementSelector'
 import { ColorKind, ColorElement, ColorType, Action } from '../lib/eftypes';
 
@@ -14,7 +14,7 @@ export type ColorSelectorProps = {
 };
 
 
-const ColorSelector: React.FC<ColorSelectorProps> = ({ t, kind, values, dispatch }) => {
+const ColorSelector: React.FC<ColorSelectorProps> = memo(({ t, kind, values, dispatch }) => {
   let elements: ColorElementProp[] = [];
   let colors: ColorElement[];
   let maxes: number[]
@@ -47,6 +47,16 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ t, kind, values, dispatch
       }
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // メモ化用の比較。前景/背景が同じで、色の値もすべて同じなら、trueを返して更新しない。
+  if (prevProps.kind === nextProps.kind) {
+    if (prevProps.values[0] === nextProps.values[0]
+        && prevProps.values[1] === nextProps.values[1]
+        && prevProps.values[2] === nextProps.values[2]) {
+      return true;
+    }
+  }
+  return false;
+});
 
 export default ColorSelector;

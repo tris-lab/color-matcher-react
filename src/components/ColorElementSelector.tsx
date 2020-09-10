@@ -1,7 +1,7 @@
 // 色を構成する1要素を表示・選択するコンポーネント。
 // スライダー・テキストボックス・値表示で構成される。
 
-import React, { Dispatch } from 'react';
+import React, { Dispatch, memo } from 'react';
 import { ColorKind, ColorElement, Action } from '../lib/eftypes';
 
 
@@ -15,7 +15,7 @@ export type ColorElementProp = {
 };
 
 
-const ColorElementSelector: React.FC<ColorElementProp> = ({ kind, element, label, max, value, dispatch }) => {
+const ColorElementSelector: React.FC<ColorElementProp> = memo(({ kind, element, label, max, value, dispatch }) => {
   // labelが省略されているとき、elementの1文字目を取得してlabelとする。
   if (label == null) {
     label = element.charAt(0);
@@ -45,6 +45,6 @@ const ColorElementSelector: React.FC<ColorElementProp> = ({ kind, element, label
       </label>
     </div>
   )
-}
+});
 
 export default ColorElementSelector;
